@@ -18,7 +18,7 @@ services:
       - DB_USERNAME=abs_user
       - DB_PASSWORD=abs_password
     volumes:
-      - ./storage:/var/www/html/storage
+      - storage-data:/var/www/html/storage
       - ./.env:/var/www/html/.env
     depends_on:
       mysql:
@@ -73,4 +73,6 @@ networks:
 
 volumes:
   mysql-data:
+    driver: local
+  storage-data:
     driver: local

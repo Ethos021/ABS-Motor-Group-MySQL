@@ -59,7 +59,7 @@ After starting the containers:
 ### Laravel Application (`app`)
 - **Port**: 8000
 - **Container Name**: abs-motor-app
-- **Description**: Laravel application with PHP 8.2 and Apache
+- **Description**: Laravel application with PHP 8.4 and Apache
 
 ### MySQL Database (`mysql`)
 - **Port**: 3306
@@ -139,7 +139,8 @@ Key environment variables in `.env`:
 ## Data Persistence
 
 - MySQL data is stored in a Docker volume named `mysql-data`
-- Storage files are mounted from `./storage` directory
+- Laravel storage files are stored in a Docker volume named `storage-data`
+- Both volumes persist data even when containers are stopped
 
 ## Troubleshooting
 
@@ -156,6 +157,15 @@ If you encounter permission errors:
 sudo chown -R $USER:$USER storage bootstrap/cache
 chmod -R 755 storage bootstrap/cache
 ```
+
+### Development mode with local storage
+For development, if you want to access storage files directly from your host machine, you can modify `docker-compose.yml` to mount the local storage directory:
+```yaml
+volumes:
+  - ./storage:/var/www/html/storage  # Mount local storage (development only)
+  - ./.env:/var/www/html/.env
+```
+Note: This is not recommended for production due to permission and security concerns.
 
 ### Reset everything
 To start fresh (⚠️ This will delete all data):
