@@ -1,0 +1,78 @@
+services:
+  # Laravel Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: abs-motor-app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=abs_motor
+      - DB_USERNAME=abs_user
+      - DB_PASSWORD=abs_password
+    volumes:
+      - storage-data:/var/www/html/storage
+      - ./.env:/var/www/html/.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - abs-network
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: abs-motor-mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=abs_motor
+      - MYSQL_USER=abs_user
+      - MYSQL_PASSWORD=abs_password
+      - MYSQL_ROOT_PASSWORD=root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - abs-network
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: abs-motor-phpmyadmin
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=root_password
+      - UPLOAD_LIMIT=100M
+    ports:
+      - "8080:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - abs-network
+
+networks:
+  abs-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  storage-data:
+    driver: local

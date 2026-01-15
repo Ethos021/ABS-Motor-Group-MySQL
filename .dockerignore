@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+
+# IDEs
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Laravel
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.yaml
+Homestead.json
+auth.json
+/storage/pail
+
+# Build artifacts
+/public/build
+/public/hot
+/public/storage
+
+# Tests
+/tests
+phpunit.xml
+
+# Documentation
+*.md
+README.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
