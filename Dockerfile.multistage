@@ -1,6 +1,26 @@
-# Dockerfile for Laravel Application with React/Inertia.js
-# Note: Run 'npm run build' locally before building this Docker image
+# Multi-stage Dockerfile for Laravel Application with React/Inertia.js
+# This builds frontend assets inside Docker (slower but self-contained)
 
+# Stage 1: Build frontend assets
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+# Copy source files needed for build
+COPY vite.config.ts tsconfig.json eslint.config.js components.json ./
+COPY resources ./resources
+COPY public ./public
+
+# Build frontend assets
+RUN npm run build
+
+# Stage 2: PHP runtime with Apache
 FROM php:8.4-apache
 
 # Install system dependencies
@@ -27,6 +47,9 @@ WORKDIR /var/www/html
 
 # Copy application files
 COPY . /var/www/html
+
+# Copy built frontend assets from builder stage
+COPY --from=frontend-builder /app/public/build /var/www/html/public/build
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
@@ -61,4 +84,3 @@ apache2-foreground\n\
 EXPOSE 80
 
 CMD ["/usr/local/bin/start.sh"]
-

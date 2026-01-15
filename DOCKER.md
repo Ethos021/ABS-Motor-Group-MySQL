@@ -6,8 +6,11 @@ This project includes a full-stack Docker setup with Laravel, MySQL, and phpMyAd
 
 - Docker (version 20.10 or higher)
 - Docker Compose (version 2.0 or higher)
+- Node.js and npm (for building frontend assets locally)
 
 ## Quick Start
+
+### Option 1: Build Frontend Locally (Recommended - Faster)
 
 1. **Clone the repository** (if you haven't already):
    ```bash
@@ -15,19 +18,41 @@ This project includes a full-stack Docker setup with Laravel, MySQL, and phpMyAd
    cd ABS-Motor-Group-MySQL
    ```
 
-2. **Create your `.env` file**:
+2. **Install dependencies and build frontend assets**:
+   ```bash
+   npm install
+   npm run build
+   ```
+
+3. **Create your `.env` file**:
    ```bash
    cp .env.example .env
    ```
 
-3. **Build and start the containers**:
+4. **Build and start the containers**:
    ```bash
-   docker-compose up -d --build
+   docker compose up -d --build
    ```
 
-4. **Access the application**:
-   - **Laravel App**: http://localhost:8000
-   - **phpMyAdmin**: http://localhost:8080
+### Option 2: Build Everything in Docker (Self-Contained)
+
+If you prefer to build frontend assets inside Docker:
+
+1. **Use the multi-stage Dockerfile**:
+   ```bash
+   docker compose -f docker-compose.yml up -d --build
+   ```
+   
+   Or manually specify the multi-stage Dockerfile:
+   ```bash
+   docker build -f Dockerfile.multistage -t abs-motor-app .
+   ```
+
+## Access the Application
+
+After starting the containers:
+- **Laravel App**: http://localhost:8000
+- **phpMyAdmin**: http://localhost:8080
 
 ## Services
 
@@ -54,28 +79,28 @@ This project includes a full-stack Docker setup with Laravel, MySQL, and phpMyAd
 
 ### Start the containers
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Stop the containers
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### View logs
 ```bash
 # All containers
-docker-compose logs -f
+docker compose logs -f
 
 # Specific container
-docker-compose logs -f app
-docker-compose logs -f mysql
-docker-compose logs -f phpmyadmin
+docker compose logs -f app
+docker compose logs -f mysql
+docker compose logs -f phpmyadmin
 ```
 
 ### Rebuild containers
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ### Access the application container
@@ -135,9 +160,16 @@ chmod -R 755 storage bootstrap/cache
 ### Reset everything
 To start fresh (⚠️ This will delete all data):
 ```bash
-docker-compose down -v
-docker-compose up -d --build
+docker compose down -v
+docker compose up -d --build
 ```
+
+## Dockerfiles Explained
+
+This project includes two Dockerfile options:
+
+- **`Dockerfile`** (Default): Expects frontend assets to be built locally before building the Docker image. Faster and more reliable.
+- **`Dockerfile.multistage`** (Optional): Builds frontend assets inside Docker using multi-stage build. Self-contained but slower.
 
 ## Production Deployment
 
