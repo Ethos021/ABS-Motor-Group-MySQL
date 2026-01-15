@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -14,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->timestamp('created_date')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('updated_date')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+            $table->timestamp('created_date')->useCurrent();
+            $table->timestamp('updated_date')->useCurrent()->useCurrentOnUpdate();
             $table->string('created_by', 255)->nullable();
             $table->string('full_name', 255)->nullable();
             $table->string('email', 255)->unique();
