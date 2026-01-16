@@ -4,6 +4,10 @@ import { type SharedData } from '@/types';
 
 import { dashboard, login, register } from '@/routes';
 
+// Home components are available at: import * as HomeComponents from '@/components/home';
+// Or import specific components: import { FeaturedVehicle, HeroSection } from '@/components/home';
+// See resources/js/components/home/README.md for usage documentation
+
 export default function Welcome({
     canRegister = true,
 }: {
