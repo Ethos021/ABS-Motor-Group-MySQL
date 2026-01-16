@@ -1,6 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 
-import * as HomeComponents from '@/components/home';
 import { type SharedData } from '@/types';
 
 import { dashboard, login, register } from '@/routes';
@@ -31,7 +30,6 @@ export default function Welcome({
                             >
                                 Dashboard
                             </Link>
-                            
                         ) : (
                             <>
                                 <Link
