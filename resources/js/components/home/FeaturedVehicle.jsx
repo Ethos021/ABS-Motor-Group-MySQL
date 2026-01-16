@@ -21,11 +21,16 @@ export default function FeaturedVehicle({ vehicle }) {
         window.open(`https://wa.me/61419330301?text=${message}`, '_blank');
     };
 
+    // Financing calculation constants
+    const FINANCING_PERCENTAGE = 0.9; // 90% financing, 10% deposit
+    const ANNUAL_INTEREST_RATE = 0.0599; // 5.99% annual rate
+    const LOAN_TERM_MONTHS = 60; // 5 year loan term
+
     const calculateStandardWeeklyPayment = (price) => {
         if (!price) return null;
-        const principal = price * 0.9;
-        const monthlyRate = 0.0599 / 12;
-        const termInMonths = 60;
+        const principal = price * FINANCING_PERCENTAGE;
+        const monthlyRate = ANNUAL_INTEREST_RATE / 12;
+        const termInMonths = LOAN_TERM_MONTHS;
 
         if (principal <= 0) return 0;
 

@@ -34,3 +34,4 @@ import { FeaturedVehicle } from '@/components/home';
 ## Available Components
 
 - **FeaturedVehicle**: Displays a featured vehicle with details, images, and call-to-action buttons
+- **HeroSection**: Simple hero section for the home page with title and description
