@@ -17,6 +17,24 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # Vite Dev Server for Hot Module Replacement
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: abs-motor-group-vite
+    working_dir: /var/www
+    command: npm run dev
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/var/www
+    networks:
+      - abs-motor-group-network
+    depends_on:
+      - app
         
   web:
     image: nginx:alpine
