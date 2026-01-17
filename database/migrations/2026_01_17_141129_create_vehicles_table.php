@@ -9,21 +9,29 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
-{
-    Schema::create('vehicles', function (Blueprint $table) {
-        $table->id();
-        $table->string('make');
-        $table->string('model');
-        $table->integer('year');
-        $table->decimal('price', 10, 2);
-        $table->integer('mileage');
-        $table->string('body_type')->nullable();
-        $table->string('fuel_type')->nullable();
-        $table->string('stock_number')->nullable();
-        $table->text('description')->nullable();
-        $table->string('image_url')->nullable();
-        $table->timestamps();
-    });
-}
+    public function up(): void
+    {
+        Schema::create('vehicles', function (Blueprint $table) {
+            $table->id();
+            $table->string('make');
+            $table->string('model');
+            $table->integer('year');
+            $table->decimal('price', 10, 2);
+            $table->integer('mileage');
+            $table->string('body_type')->nullable();
+            $table->string('fuel_type')->nullable();
+            $table->string('stock_number')->nullable();
+            $table->text('description')->nullable();
+            $table->string('image_url')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('vehicles');
+    }
 };
