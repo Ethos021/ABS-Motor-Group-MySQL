@@ -17,7 +17,7 @@ class VehicleController extends Controller
     // GET /api/vehicles/{id}
     public function show($id)
     {
-        $vehicle = Vehicle:: findOrFail($id);
+        $vehicle = Vehicle::findOrFail($id);
         return response()->json($vehicle);
     }
 
