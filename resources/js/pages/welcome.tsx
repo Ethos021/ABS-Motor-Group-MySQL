@@ -2,6 +2,7 @@ import { Head, usePage } from '@inertiajs/react';
 import HeroSection from "@/components/home/HeroSection";
 import { type SharedData } from '@/types';
 import { Vehicle } from '@/types';
+import Layout from "@/components/layout"
 
 export default function Welcome({
     canRegister = true,
@@ -13,6 +14,7 @@ export default function Welcome({
 
     return (
         <>
+        <Layout currentPageName={'Home'}>
             <Head title="Welcome">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
@@ -22,6 +24,7 @@ export default function Welcome({
             </Head>
 
             <HeroSection vehicles={vehicles} />
+        </Layout>
         </>
     );
 }
