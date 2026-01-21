@@ -2,20 +2,22 @@
 import React from "react";
 import { Link, usePage } from "@inertiajs/react";
 import { createPageUrl } from "@/utils";
-import { Phone, MessageCircle, MapPin, Clock } from "lucide-react";
+import { Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Layout({ children }) {
-  const { url } = usePage(); // get current page URL from Inertia
+  const { url } = usePage(); // current Inertia URL
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-  // Use this to highlight active page
+  // Highlight active page
   const isActive = (pageName) => {
-    return url === createPageUrl(pageName);
+    return url.startsWith(createPageUrl(pageName));
   };
 
   const userLogoUrl =
     "https://cdn.prod.website-files.com/68aefaa8e956052ea849f3a1/68b129e1e4c32f155e2e861d_logo%20edited.svg";
+
+  const pages = ["Home", "Browse", "Sell", "Finance", "About", "Contact"];
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -29,98 +31,73 @@ export default function Layout({ children }) {
           --text-secondary: #a1a1a1;
           --border-subtle: #2a2a2a;
         }
-        
-        body {
-          background-color: var(--primary-dark);
-          color: var(--text-primary);
-        }
-        
-        .gradient-red {
-          background: linear-gradient(135deg, var(--accent-red), #e53935);
-        }
-        
-        .luxury-shadow {
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-        }
-        
-        .glass-effect {
-          backdrop-filter: blur(16px);
-          background: rgba(26, 26, 26, 0.8);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        body { background-color: var(--primary-dark); color: var(--text-primary); }
+        .gradient-red { background: linear-gradient(135deg, var(--accent-red), #e53935); }
+        .luxury-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+        .glass-effect { backdrop-filter: blur(16px); background: rgba(26, 26, 26, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); }
       `}</style>
 
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 glass-effect border-b border-zinc-800">
-        <div className="container mx-auto px-6 py-4">
-          <nav className="flex items-center justify-between">
-            {/* Logo */}
-            <Link to={createPageUrl("Home")} className="flex items-center space-x-3">
-              <div className="w-[90px] h-[90px] rounded-full flex items-center justify-center">
-                <img src={userLogoUrl} alt="A.B.S Motor Group Logo" className="w-full h-full object-contain" />
-              </div>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {["Home", "Browse", "Sell", "Finance", "About", "Contact"].map((page) => (
-                <Link
-                  key={page}
-                  to={createPageUrl(page)}
-                  className={`text-sm font-medium transition-colors hover:text-red-500 ${
-                    isActive(page) ? "text-red-500" : "text-zinc-300"
-                  }`}
-                >
-                  {page === "Browse" ? "Browse Stock" : page === "Sell" ? "Sell Your Car" : page}
-                </Link>
-              ))}
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          {/* Logo */}
+          <Link href={createPageUrl("Home")} className="flex items-center space-x-3">
+            <div className="w-[90px] h-[90px] rounded-full flex items-center justify-center">
+              <img src={userLogoUrl} alt="A.B.S Motor Group Logo" className="w-full h-full object-contain" />
             </div>
+          </Link>
 
-            {/* Quick Contact */}
-            <div className="hidden lg:flex items-center space-x-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-                asChild
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {pages.map((page) => (
+              <Link
+                key={page}
+                href={createPageUrl(page)}
+                className={`text-sm font-medium transition-colors hover:text-red-500 ${
+                  isActive(page) ? "text-red-500" : "text-zinc-300"
+                }`}
               >
-                <a href="tel:+61394840084">
-                  <Phone className="w-4 h-4 mr-2" />
-                  03 9484 0084
-                </a>
-              </Button>
-              <Button size="sm" className="gradient-red text-zinc-50 hover:opacity-90" asChild>
-                <Link to={createPageUrl("Contact")}>
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Contact Us
-                </Link>
-              </Button>
-            </div>
+                {page === "Browse" ? "Browse Stock" : page === "Sell" ? "Sell Your Car" : page}
+              </Link>
+            ))}
+          </div>
 
-            {/* Mobile Menu Button */}
+          {/* Quick Contact */}
+          <div className="hidden lg:flex items-center space-x-3">
             <Button
-              variant="ghost"
-              className="md:hidden"
+              variant="outline"
               size="sm"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+              asChild
             >
-              <div className="w-5 h-5 flex flex-col justify-center space-y-1">
-                <div className="w-full h-0.5 bg-zinc-300"></div>
-                <div className="w-full h-0.5 bg-zinc-300"></div>
-                <div className="w-full h-0.5 bg-zinc-300"></div>
-              </div>
+              <a href="tel:+61394840084">
+                <Phone className="w-4 h-4 mr-2" />
+                03 9484 0084
+              </a>
             </Button>
-          </nav>
+            <Button size="sm" className="gradient-red text-zinc-50 hover:opacity-90" asChild>
+              <Link href={createPageUrl("Contact")}>Contact Us</Link>
+            </Button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <Button variant="ghost" className="md:hidden" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <div className="w-5 h-5 flex flex-col justify-center space-y-1">
+              <div className="w-full h-0.5 bg-zinc-300"></div>
+              <div className="w-full h-0.5 bg-zinc-300"></div>
+              <div className="w-full h-0.5 bg-zinc-300"></div>
+            </div>
+          </Button>
         </div>
 
         {/* Mobile Menu Panel */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-zinc-800 bg-zinc-900">
             <nav className="container mx-auto px-6 py-4 space-y-3">
-              {["Home", "Browse", "Sell", "Finance", "About", "Contact"].map((page) => (
+              {pages.map((page) => (
                 <Link
                   key={page}
-                  to={createPageUrl(page)}
+                  href={createPageUrl(page)}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`block py-2 text-base font-medium transition-colors ${
                     isActive(page) ? "text-red-500" : "text-zinc-300"

@@ -1,11 +1,11 @@
 export function createPageUrl(pageName: string) {
-  switch(pageName) {
-    case "Home": return "/";
-    case "Browse": return "/browse";
-    case "Sell": return "/sell";
-    case "Finance": return "/finance";
-    case "About": return "/about";
-    case "Contact": return "/contact";
+  switch(pageName.toLocaleLowerCase()) {
+    case "home": return "/";
+    case "browse": return "/browse";
+    case "sell": return "/sell";
+    case "finance": return "/finance";
+    case "about": return "/about";
+    case "contact": return "/contact";
     default: return "/";
   }
 }
