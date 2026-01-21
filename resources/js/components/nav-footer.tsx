@@ -1,5 +1,3 @@
-import { type ComponentPropsWithoutRef } from 'react';
-
 import { Icon } from '@/components/icon';
 import {
     SidebarGroup,
@@ -8,8 +6,9 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { toUrl } from '@/lib/utils';
+import { resolveUrl } from '@/lib/utils';
 import { type NavItem } from '@/types';
+import { type ComponentPropsWithoutRef } from 'react';
 
 export function NavFooter({
     items,
@@ -32,7 +31,7 @@ export function NavFooter({
                                 className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
                             >
                                 <a
-                                    href={toUrl(item.href)}
+                                    href={resolveUrl(item.href)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >

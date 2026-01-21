@@ -1,0 +1,75 @@
+// API_BASE_URL can be a string from env or default
+const API_BASE_URL:  string = import.meta.env. VITE_API_URL || "/api";
+
+const buildUrl = (path: string): string => {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${API_BASE_URL}${normalized}`;
+};
+
+const toJson = async (response:  Response): Promise<any> => {
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || response.statusText);
+  }
+  if (response.status === 204) return null;
+  return response.json();
+};
+
+// Get CSRF token from meta tag (Laravel requirement)
+const getCsrfToken = (): string => {
+  return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "";
+};
+
+export const apiClient = {
+  get: async (path: string): Promise<any> => {
+    const res = await fetch(buildUrl(path));
+    return toJson(res);
+  },
+  
+  post: async (path: string, body: any): Promise<any> => {
+    const res = await fetch(buildUrl(path), {
+      method: "POST",
+      headers: { 
+        "Content-Type":  "application/json",
+        "X-CSRF-TOKEN": getCsrfToken(),
+      },
+      body: JSON.stringify(body),
+    });
+    return toJson(res);
+  },
+  
+  put: async (path: string, body: any): Promise<any> => {
+    const res = await fetch(buildUrl(path), {
+      method: "PUT",
+      headers: { 
+        "Content-Type":  "application/json",
+        "X-CSRF-TOKEN": getCsrfToken(),
+      },
+      body: JSON.stringify(body),
+    });
+    return toJson(res);
+  },
+  
+  delete: async (path: string): Promise<any> => {
+    const res = await fetch(buildUrl(path), { 
+      method: "DELETE",
+      headers: {
+        "X-CSRF-TOKEN": getCsrfToken(),
+      },
+    });
+    return toJson(res);
+  },
+  
+  uploadCsv: async (path: string, file: File): Promise<any> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(buildUrl(path), {
+      method: "POST",
+      headers: {
+        "X-CSRF-TOKEN":  getCsrfToken(),
+      },
+      body: formData,
+    });
+    return toJson(res);
+  },
+};
