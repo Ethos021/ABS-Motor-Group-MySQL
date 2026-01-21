@@ -7,11 +7,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Input } from "@/components/ui/input";
 import { Search, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
 const heroImages = [
-  "/images/hero-1.jpg",
-  "/images/hero-2.jpg",
-  "/images/hero-3.jpg",
+  "/images/hero-image1.jpg",
+  "/images/hero-image2.jpg",
+  "/images/hero-image3.jpg",
 ];
 
 export default function HeroSection({ vehicles = [] }) {
