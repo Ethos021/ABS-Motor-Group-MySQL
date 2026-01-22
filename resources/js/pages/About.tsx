@@ -106,7 +106,7 @@ export default function About() {
                 <div className="absolute -bottom-8 -left-8 bg-zinc-800 rounded-xl p-4 flex items-center gap-4 border border-zinc-700">
                   <div className="w-12 h-12 bg-white rounded-md flex items-center justify-center">
                     <img
-                      src="https://images.squarespace-cdn.com/content/v1/5e718e24c539f905c3d25f29/1585292728987-9VBC1Y92TO4Y09C6I4D9/VACC-logo.png"
+                      src="/images/VACC.png"
                       alt="VACC"
                       className="object-contain"
                     />

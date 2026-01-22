@@ -23,4 +23,8 @@ Route::get('/about', function () {
     return Inertia::render('About');
 })->name('about');
 
+Route::get('/finance', function () {
+    return Inertia::render('Finance');
+})->name('finance');
+
 require __DIR__.'/settings.php';
