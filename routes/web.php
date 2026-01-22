@@ -27,4 +27,10 @@ Route::get('/finance', function () {
     return Inertia::render('Finance');
 })->name('finance');
 
+Route::get('/sell', function () {
+    return Inertia::render('Sell');
+});
+
+Route::post('/sell', [SellController::class, 'store']);
+
 require __DIR__.'/settings.php';
