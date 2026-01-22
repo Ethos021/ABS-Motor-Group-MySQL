@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\BrowseController;
 // Route::get('/', [VehicleController::class, 'hero'])->name('home');
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -30,6 +31,8 @@ Route::get('/finance', function () {
 Route::get('/sell', function () {
     return Inertia::render('Sell');
 });
+
+Route::get('/browse', [BrowseController::class, 'index'])->name('browse');
 
 Route::post('/sell', [SellController::class, 'store']);
 

@@ -82,19 +82,31 @@ services:
     networks:
       - abs-motor-group-network
 
-  # phpMyAdmin
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: abs-motor-group-phpmyadmin
+  # # phpMyAdmin
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin
+  #   container_name: abs-motor-group-phpmyadmin
+  #   restart: unless-stopped
+  #   environment:
+  #     PMA_HOST: db              # Hostname of MySQL container
+  #     PMA_PORT: 3306            # MySQL port
+  #     PMA_USER: abs_admin       # Use your app user instead of root
+  #     PMA_PASSWORD: abs_password
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - abs-motor-group-network
+
+  adminer:
+    image: adminer:latest
+    container_name: abs-motor-group-adminer
     restart: unless-stopped
     environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_USER: abs_admin
-      PMA_PASSWORD: abs_password
-      MYSQL_ROOT_PASSWORD: abs_password
+      ADMINER_DEFAULT_DB_DRIVER: server  # Use MySQL
     ports:
-      - "8080:80"
+      - "8081:8080"  # Access at http://localhost:8080
     depends_on:
       - db
     networks:
