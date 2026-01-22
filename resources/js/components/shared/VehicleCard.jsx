@@ -64,7 +64,7 @@ export default function VehicleCard({ vehicle }) {
         {/* Price Badge */}
         <div className="absolute top-4 left-4">
           <Badge className="gradient-red text-zinc-50 text-lg font-bold px-3 py-1">
-            ${vehicle.price?.toLocaleString()}
+            ${vehicle.price ? Number(vehicle.price).toLocaleString() : "N/A"}
           </Badge>
         </div>
 
@@ -109,7 +109,8 @@ export default function VehicleCard({ vehicle }) {
         <div className="grid grid-cols-2 gap-3 mb-6 text-sm">
           <div className="flex items-center space-x-2 text-zinc-400">
             <Gauge className="w-4 h-4" />
-            <span>{vehicle.kilometers?.toLocaleString()} km</span>
+            <span>{vehicle.kilometers ? Number(vehicle.kilometers).toLocaleString() : "N/A"} km</span>
+
           </div>
           <div className="flex items-center space-x-2 text-zinc-400">
             <Fuel className="w-4 h-4" />
