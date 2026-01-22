@@ -14,6 +14,7 @@ class VehicleController extends Controller
             'vehicles' => Vehicle::select('id', 'make', 'year', 'price', 'kilometers')->get(),
         ]);
     }
+    
 
     public function browse(Request $request)
     {

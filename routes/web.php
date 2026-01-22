@@ -19,4 +19,8 @@ Route::get('/contact', function () {
 })->name('contact');
 Route::post('/contact', [ContactController::class, 'store']);
 
+Route::get('/about', function () {
+    return Inertia::render('About');
+})->name('about');
+
 require __DIR__.'/settings.php';

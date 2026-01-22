@@ -1,5 +1,9 @@
 import { Head, usePage } from '@inertiajs/react';
 import HeroSection from "@/components/home/HeroSection";
+import QuickActionCards from "@/components/home/QuickActionCards";
+import NewArrivals from "@/components/home/NewArrivals";
+import WhyAutohaus from "@/components/home/WhyAutohaus";
+import ShowroomLocation from "@/components/home/ShowroomLocation";
 import { type SharedData } from '@/types';
 import { Vehicle } from '@/types';
 import Layout from "@/components/layout"
@@ -24,6 +28,10 @@ export default function Welcome({
             </Head>
 
             <HeroSection vehicles={vehicles} />
+            <QuickActionCards></QuickActionCards>
+            <NewArrivals></NewArrivals>
+            <WhyAutohaus></WhyAutohaus>
+            <ShowroomLocation></ShowroomLocation>
         </Layout>
         </>
     );
