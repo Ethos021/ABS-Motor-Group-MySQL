@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class VehicleController extends Controller
 {
     // List all vehicles (for HeroSection)
-   public function index()
+    public function index()
     {
         return response()->json(Vehicle::all());
     }
@@ -39,6 +39,28 @@ class VehicleController extends Controller
 
         return Inertia::render('Browse', [
             'vehicles' => $vehicles
+        ]);
+    }
+
+    // Show a single vehicle (VehicleDetail page)
+    public function show($id)
+    {
+        // Get the vehicle by ID
+        $vehicle = Vehicle::find($id);
+
+        if (!$vehicle) {
+            abort(404, 'Vehicle not found');
+        }
+
+        // Get related vehicles (same make, excluding itself)
+        $relatedVehicles = Vehicle::where('make', $vehicle->make)
+            ->where('id', '!=', $vehicle->id)
+            ->take(3)
+            ->get();
+
+        return Inertia::render('VehicleDetail', [
+            'vehicle' => $vehicle,
+            'relatedVehicles' => $relatedVehicles,
         ]);
     }
 }

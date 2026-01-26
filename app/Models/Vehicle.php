@@ -78,6 +78,7 @@ class Vehicle extends Model
 
     protected $casts = [
         'images' => 'array',
+        'features'=>'array',
         'toilet' => 'boolean',
         'shower' => 'boolean',
         'air_conditioning' => 'boolean',

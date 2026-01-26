@@ -7,15 +7,15 @@ import { Car, Fuel, Gauge, Calendar, Phone, MessageCircle } from "lucide-react";
 export default function VehicleCard({ vehicle }) {
   // Navigate to vehicle detail page using Inertia
   const handleViewDetails = () => {
-    router.visit(route("vehicle.show", vehicle.id));
+    router.visit(`/vehicle/${vehicle.id}`);
   };
 
-  // Call button
+  // Call dealership
   const handleCall = () => {
     window.open("tel:+61419330301", "_self");
   };
 
-  // WhatsApp button
+  // WhatsApp dealership
   const handleWhatsApp = () => {
     const message = encodeURIComponent(
       `Hi, I'm interested in the ${vehicle.year} ${vehicle.make} ${vehicle.model} priced at $${vehicle.price?.toLocaleString()}. Can you provide more information?`
@@ -23,24 +23,21 @@ export default function VehicleCard({ vehicle }) {
     window.open(`https://wa.me/61419330301?text=${message}`, "_blank");
   };
 
-  // Calculate standard weekly payment
-  const calculateStandardWeeklyPayment = (price) => {
+  // Standard weekly payment calculation
+  const calculateWeeklyPayment = (price) => {
     if (!price) return null;
     const principal = price * 0.9; // 10% deposit
     const monthlyRate = 0.0599 / 12; // 5.99% annual
     const termInMonths = 60; // 5 years
-
     if (principal <= 0) return 0;
-
     const monthlyPayment =
       (principal * monthlyRate * Math.pow(1 + monthlyRate, termInMonths)) /
       (Math.pow(1 + monthlyRate, termInMonths) - 1);
     const weeklyPayment = (monthlyPayment * 12) / 52;
-
     return weeklyPayment.toFixed(0);
   };
 
-  const weeklyPayment = calculateStandardWeeklyPayment(vehicle.price);
+  const weeklyPayment = calculateWeeklyPayment(vehicle.price);
 
   return (
     <div className="bg-zinc-900 rounded-2xl overflow-hidden luxury-shadow group hover:scale-[1.02] transition-all duration-300">
@@ -81,7 +78,7 @@ export default function VehicleCard({ vehicle }) {
           ))}
         </div>
 
-        {/* Finance Overlay */}
+        {/* Weekly Payment Badge */}
         {weeklyPayment && (
           <div className="absolute bottom-4 left-4">
             <Badge
@@ -101,7 +98,7 @@ export default function VehicleCard({ vehicle }) {
             {vehicle.year} {vehicle.make} {vehicle.model}
           </h3>
           <p className="text-zinc-400 text-sm line-clamp-2">
-            {vehicle.description || `${vehicle.engine || vehicle.fuel_type}`}
+            {vehicle.description || vehicle.engine || vehicle.fuel_type}
           </p>
         </div>
 
@@ -110,19 +107,18 @@ export default function VehicleCard({ vehicle }) {
           <div className="flex items-center space-x-2 text-zinc-400">
             <Gauge className="w-4 h-4" />
             <span>{vehicle.kilometers ? Number(vehicle.kilometers).toLocaleString() : "N/A"} km</span>
-
           </div>
           <div className="flex items-center space-x-2 text-zinc-400">
             <Fuel className="w-4 h-4" />
-            <span>{vehicle.fuel_type}</span>
+            <span>{vehicle.fuel_type || "N/A"}</span>
           </div>
           <div className="flex items-center space-x-2 text-zinc-400">
             <Car className="w-4 h-4" />
-            <span>{vehicle.transmission}</span>
+            <span>{vehicle.transmission || "N/A"}</span>
           </div>
           <div className="flex items-center space-x-2 text-zinc-400">
             <Calendar className="w-4 h-4" />
-            <span>{vehicle.body_type}</span>
+            <span>{vehicle.body_type || "N/A"}</span>
           </div>
         </div>
 
@@ -140,7 +136,6 @@ export default function VehicleCard({ vehicle }) {
               variant="outline"
               size="sm"
               className="flex-1 bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800"
-              aria-label="Call dealership"
             >
               <Phone className="w-4 h-4 mr-1" />
               Call
@@ -150,7 +145,6 @@ export default function VehicleCard({ vehicle }) {
               variant="outline"
               size="sm"
               className="flex-1 bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800"
-              aria-label="WhatsApp dealership"
             >
               <MessageCircle className="w-4 h-4 mr-1" />
               WhatsApp

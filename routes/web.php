@@ -7,6 +7,7 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\BrowseController;
 use App\Http\Controllers\EnquiryController;
+use App\Http\Controllers\VehicleController;
 // Route::get('/', [VehicleController::class, 'hero'])->name('home');
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -39,6 +40,8 @@ Route::post('/sell-vehicle', [EnquiryController::class, 'store'])
 Route::get('/browse', [BrowseController::class, 'index'])->name('browse');
 
 Route::post('/contact-submit', [EnquiryController::class, 'store']);
+
+Route::get('/vehicle/{id}', [VehicleController::class, 'show'])->name('vehicle.show');
 
 
 require __DIR__.'/settings.php';
