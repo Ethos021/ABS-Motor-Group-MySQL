@@ -6,6 +6,7 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\BrowseController;
+use App\Http\Controllers\EnquiryController;
 // Route::get('/', [VehicleController::class, 'hero'])->name('home');
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -28,12 +29,15 @@ Route::get('/finance', function () {
     return Inertia::render('Finance');
 })->name('finance');
 
-Route::get('/sell', function () {
-    return Inertia::render('Sell');
-});
+// Route::get('/sell', function () {
+//     return Inertia::render('Sell');
+// });
 
 Route::get('/browse', [BrowseController::class, 'index'])->name('browse');
 
-Route::post('/sell', [SellController::class, 'store']);
+// Route::post('/sell', [SellController::class, 'store']);
+
+Route::post('/contact-submit', [EnquiryController::class, 'store']);
+
 
 require __DIR__.'/settings.php';

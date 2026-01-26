@@ -92,13 +92,14 @@ export default function HeroSection({ vehicles = [] }) {
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ duration: 0.6, delay: 0.2 }}
-    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 backdrop-blur-sm mb-6"
+    className="inline-flex w-fit items-center gap-1.5 px-2.5 py-2 rounded-full bg-red-500/10 border border-red-500/20 backdrop-blur-sm mb-6"
   >
     <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
     <span className="text-red-500 text-sm font-medium tracking-wider">
-      OPEN MON-FRI
+      OPEN MON-SAT
     </span>
   </motion.div>
+
 
   <h1 className="text-6xl font-bold text-white mb-6">
     Welcome to <span className="text-red-500">A.B.S Motor Group</span>

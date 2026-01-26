@@ -1,7 +1,7 @@
 // resources/js/pages/Contact.tsx
 import React, { useState } from "react";
-import { router } from "@inertiajs/react";
-import Layout from "@/components/layout"; // Added layout
+import { router, usePage } from "@inertiajs/react";
+import Layout from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,19 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, MessageCircle, Mail, MapPin, Clock, Send, CheckCircle } from "lucide-react";
 import GoogleMap from "@/components/shared/GoogleMap";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Contact() {
+  const flash = usePage<{ flash?: { success?: boolean; enquiryId?: number } }>().props.flash ?? {};
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     subject: "",
     message: "",
-    preferredContact: ""
+    preferredContact: "",
   });
-
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(flash.success || false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -31,7 +33,31 @@ export default function Contact() {
     e.preventDefault();
     setLoading(true);
 
-    router.post("/contact-submit", formData, {
+    const nameParts = formData.name.trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    const enquiryTypeMap: Record<string, string> = {
+      "General Enquiry": "general",
+      "Vehicle Interest": "vehicle_interest",
+      "Book Test Drive": "test_drive",
+      "Finance Question": "finance",
+      "Trade-In Valuation": "trade_in",
+      "Service Booking": "general",
+    };
+
+    const mappedData = {
+      firstName,
+      lastName,
+      mobile: formData.phone,
+      email: formData.email,
+      message: formData.message,
+      enquiry_type: enquiryTypeMap[formData.subject] || "general",
+      preferredContactMethod: formData.preferredContact?.toLowerCase() || null,
+    };
+
+    router.post("/contact-submit", mappedData, {
+      preserveScroll: true,
       onSuccess: () => {
         setSubmitted(true);
         setLoading(false);
@@ -43,7 +69,7 @@ export default function Contact() {
   const contactMethods = [
     { icon: Phone, title: "Phone", description: "Call us directly", value: "03 9484 0084" },
     { icon: MessageCircle, title: "WhatsApp", description: "Chat with our team", value: "Business hours" },
-    { icon: Mail, title: "Email", description: "Send us a message", value: "info@absmotorgroup.com" }
+    { icon: Mail, title: "Email", description: "Send us a message", value: "info@absmotorgroup.com" },
   ];
 
   return (
@@ -54,13 +80,12 @@ export default function Contact() {
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold text-zinc-50 mb-4">Contact Us</h1>
             <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-              Our dedicated team is here to assist with enquiries, inspections, test drives, 
-              and everything in between. Experience true prestige service.
+              Our dedicated team is here to assist with enquiries, inspections, test drives, and everything in between. Experience true prestige service.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-12">
-            {/* Contact Info & Methods */}
+            {/* Contact Info */}
             <div className="space-y-6">
               {contactMethods.map((method, idx) => {
                 const Icon = method.icon;
@@ -121,131 +146,160 @@ export default function Contact() {
               <Card className="bg-zinc-900 border-zinc-800 luxury-shadow">
                 <CardHeader>
                   <CardTitle className="text-2xl text-zinc-50">
-                    {submitted ? "Message Sent" : "Send Us A Message"}
+                    Send Us A Message
                   </CardTitle>
                   <p className="text-zinc-400">
-                    {submitted
-                      ? "Thank you for contacting us. We'll be in touch within 24 hours."
-                      : "Fill out the form below and we'll get back to you within 24 hours"}
+                    Fill out the form below and we'll get back to you within 24 hours
                   </p>
                 </CardHeader>
                 <CardContent>
-                  {submitted ? (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 gradient-red rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CheckCircle className="w-8 h-8 text-zinc-50" />
-                      </div>
-                      <h3 className="text-xl font-bold text-zinc-50 mb-2">Message Received</h3>
-                      <p className="text-zinc-400 mb-6">
-                        Reference: AP-{Math.random().toString(36).substr(2, 9).toUpperCase()}
-                      </p>
-                      <Button
-                        onClick={() => setSubmitted(false)}
-                        variant="outline"
-                        className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-                      >
-                        Send Another Message
-                      </Button>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="text-sm font-medium text-zinc-300 mb-2 block">Full Name *</label>
-                          <Input
-                            placeholder="Enter your name"
-                            value={formData.name}
-                            onChange={(e) => handleInputChange("name", e.target.value)}
-                            className="bg-zinc-800 border-zinc-700 text-zinc-50"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-zinc-300 mb-2 block">Phone Number *</label>
-                          <Input
-                            placeholder="Enter your phone"
-                            value={formData.phone}
-                            onChange={(e) => handleInputChange("phone", e.target.value)}
-                            className="bg-zinc-800 border-zinc-700 text-zinc-50"
-                            required
-                          />
-                        </div>
-                      </div>
-
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
                       <div>
-                        <label className="text-sm font-medium text-zinc-300 mb-2 block">Email Address *</label>
+                        <label className="text-sm font-medium text-zinc-300 mb-2 block">Full Name *</label>
                         <Input
-                          type="email"
-                          placeholder="Enter your email"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange("email", e.target.value)}
+                          placeholder="Enter your name"
+                          value={formData.name}
+                          onChange={(e) => handleInputChange("name", e.target.value)}
                           className="bg-zinc-800 border-zinc-700 text-zinc-50"
                           required
                         />
                       </div>
-
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="text-sm font-medium text-zinc-300 mb-2 block">Subject</label>
-                          <Select onValueChange={(value) => handleInputChange("subject", value)}>
-                            <SelectTrigger className="bg-zinc-800 border-zinc-700">
-                              <SelectValue placeholder="Select enquiry type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="General Enquiry">General Enquiry</SelectItem>
-                              <SelectItem value="Vehicle Interest">Vehicle Interest</SelectItem>
-                              <SelectItem value="Test Drive">Book Test Drive</SelectItem>
-                              <SelectItem value="Finance">Finance Question</SelectItem>
-                              <SelectItem value="Trade-In">Trade-In Valuation</SelectItem>
-                              <SelectItem value="Service">Service Booking</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-zinc-300 mb-2 block">Preferred Contact Method</label>
-                          <Select onValueChange={(value) => handleInputChange("preferredContact", value)}>
-                            <SelectTrigger className="bg-zinc-800 border-zinc-700">
-                              <SelectValue placeholder="How to contact you" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Phone">Phone Call</SelectItem>
-                              <SelectItem value="Email">Email</SelectItem>
-                              <SelectItem value="WhatsApp">WhatsApp</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
                       <div>
-                        <label className="text-sm font-medium text-zinc-300 mb-2 block">Message *</label>
-                        <Textarea
-                          placeholder="Tell us how we can help..."
-                          value={formData.message}
-                          onChange={(e) => handleInputChange("message", e.target.value)}
-                          className="bg-zinc-800 border-zinc-700 text-zinc-50 h-32"
+                        <label className="text-sm font-medium text-zinc-300 mb-2 block">Phone Number *</label>
+                        <Input
+                          placeholder="Enter your phone"
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange("phone", e.target.value)}
+                          className="bg-zinc-800 border-zinc-700 text-zinc-50"
                           required
                         />
                       </div>
+                    </div>
 
-                      <Button
-                        type="submit"
-                        className="w-full gradient-red text-zinc-50 hover:opacity-90 font-semibold py-3"
-                        disabled={loading}
-                      >
-                        <Send className="w-4 h-4 mr-2" />
-                        {loading ? "Sending..." : "Send Message"}
-                      </Button>
+                    <div>
+                      <label className="text-sm font-medium text-zinc-300 mb-2 block">Email Address *</label>
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        className="bg-zinc-800 border-zinc-700 text-zinc-50"
+                        required
+                      />
+                    </div>
 
-                      <p className="text-xs text-zinc-500">
-                        By submitting this form, you agree to be contacted by A.B.S Motor Group regarding your enquiry. We respect your privacy.
-                      </p>
-                    </form>
-                  )}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="text-sm font-medium text-zinc-300 mb-2 block">Subject</label>
+                        <Select onValueChange={(value) => handleInputChange("subject", value)}>
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700">
+                            <SelectValue placeholder="Select enquiry type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="General Enquiry">General Enquiry</SelectItem>
+                            <SelectItem value="Vehicle Interest">Vehicle Interest</SelectItem>
+                            <SelectItem value="Book Test Drive">Book Test Drive</SelectItem>
+                            <SelectItem value="Finance Question">Finance Question</SelectItem>
+                            <SelectItem value="Trade-In Valuation">Trade-In Valuation</SelectItem>
+                            <SelectItem value="Service Booking">Service Booking</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-zinc-300 mb-2 block">Preferred Contact Method</label>
+                        <Select onValueChange={(value) => handleInputChange("preferredContact", value)}>
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700">
+                            <SelectValue placeholder="How to contact you" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Phone">Phone Call</SelectItem>
+                            <SelectItem value="Email">Email</SelectItem>
+                            <SelectItem value="WhatsApp">WhatsApp</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-zinc-300 mb-2 block">Message *</label>
+                      <Textarea
+                        placeholder="Tell us how we can help..."
+                        value={formData.message}
+                        onChange={(e) => handleInputChange("message", e.target.value)}
+                        className="bg-zinc-800 border-zinc-700 text-zinc-50 h-32"
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full gradient-red text-zinc-50 hover:opacity-90 font-semibold py-3"
+                      disabled={loading}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      {loading ? "Sending..." : "Send Message"}
+                    </Button>
+
+                    <p className="text-xs text-zinc-500">
+                      By submitting this form, you agree to be contacted by A.B.S Motor Group regarding your enquiry. We respect your privacy.
+                    </p>
+                  </form>
                 </CardContent>
               </Card>
             </div>
           </div>
         </div>
+
+        {/* Success Modal */}
+        <AnimatePresence>
+          {submitted && (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+              onClick={() => setSubmitted(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.8 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-8 flex flex-col items-center text-center space-y-6"
+              >
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg">
+                  <CheckCircle className="w-12 h-12 text-white animate-bounce" />
+                </div>
+                <h3 className="text-2xl font-bold text-zinc-50">Message Sent!</h3>
+                <p className="text-zinc-400">
+                  Thank you for contacting us. <br />
+                  Your reference number is{" "}
+                  <span className="text-red-500 font-semibold">
+                    AP-{String(flash.enquiryId).padStart(5, "0")}
+                  </span>
+                </p>
+                <Button
+                  onClick={() => {
+                    setSubmitted(false);
+                    setFormData({
+                      name: "",
+                      email: "",
+                      phone: "",
+                      subject: "",
+                      message: "",
+                      preferredContact: "",
+                    });
+                  }}
+                  variant="outline"
+                  className="bg-transparent border-zinc-700 text-zinc-50 hover:bg-zinc-800 transition-colors duration-300"
+                >
+                  Send Another Message
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </Layout>
   );

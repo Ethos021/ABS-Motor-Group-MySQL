@@ -15,17 +15,39 @@ class ContactController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'phone' => 'required|string',
-            'subject' => 'nullable|string',
-            'message' => 'required|string',
-            'preferredContact' => 'nullable|string',
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:50'],
+            'email' => ['required', 'email'],
+            'message' => ['required', 'string'],
+            'subject' => ['nullable', 'string'],
+            'preferredContact' => ['nullable', 'string'],
+        ]);
+        $nameParts = explode(' ', trim($validated['name']), 2);
+        Enquiries::create([
+            'enquiry_type' => match ($validated['subject'] ?? null) {
+                'Vehicle Interest' => 'vehicle_interest',
+                'Test Drive' => 'test_drive',
+                'Finance' => 'finance',
+                'Trade-In' => 'trade_in',
+                default => 'general',
+            },
+
+            'firstName' => $nameParts[0],
+            'lastName' => $nameParts[1] ?? '',
+
+            'mobile' => $validated['phone'],
+            'email' => $validated['email'],
+            'message' => $validated['message'],
+
+            'preferredContactMethod' => strtolower($validated['preferredContact'] ?? 'email'),
+
+            // Tracking / meta
+            'pageUrl' => $request->fullUrl(),
+            'referrer' => $request->headers->get('referer'),
+            'ipAddress' => $request->ip(),
         ]);
 
-        // TODO:
-        // Save to DB OR send email OR both
-
+        // IMPORTANT: return back, not redirect to a new page
         return back()->with('success', true);
     }
 }
