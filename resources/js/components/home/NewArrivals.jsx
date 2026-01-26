@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
-import VehicleCard from "../shared/VehicleCard";
+import VehicleCard from "../shared/VehicleCardtsx";
 import { motion } from "framer-motion";
 
 export default function NewArrivals({ vehicles = [] }) {

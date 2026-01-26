@@ -29,13 +29,14 @@ Route::get('/finance', function () {
     return Inertia::render('Finance');
 })->name('finance');
 
-// Route::get('/sell', function () {
-//     return Inertia::render('Sell');
-// });
+Route::get('/sell', function () {
+    return Inertia::render('Sell');
+})->name('sell');
+
+Route::post('/sell-vehicle', [EnquiryController::class, 'store'])
+    ->name('sell.store');
 
 Route::get('/browse', [BrowseController::class, 'index'])->name('browse');
-
-// Route::post('/sell', [SellController::class, 'store']);
 
 Route::post('/contact-submit', [EnquiryController::class, 'store']);
 
