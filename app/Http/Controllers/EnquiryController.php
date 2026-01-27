@@ -32,6 +32,16 @@ class EnquiryController extends Controller
         'preferredContactTime' => 'nullable|string',
     ]);
 
+    if ($request->vehicle_id) {
+    $vehicle = \App\Models\Vehicle::find($request->vehicle_id);
+
+    $validated['vehicleSnapshot'] = $vehicle
+        ? $vehicle->only(['id', 'year', 'make', 'model'])
+        : null;
+
+    $validated['vehiclePrice'] = $vehicle?->price;
+}
+
     $enquiry = Enquiry::create([
         ...$validated,
         'ipAddress' => $request->ip(),

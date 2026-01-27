@@ -43,5 +43,7 @@ Route::post('/contact-submit', [EnquiryController::class, 'store']);
 
 Route::get('/vehicle/{id}', [VehicleController::class, 'show'])->name('vehicle.show');
 
+Route::post('/enquiries', [EnquiryController::class, 'store'])->name('enquiries.store');
+
 
 require __DIR__.'/settings.php';
