@@ -13,7 +13,6 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-  Badge,
   Slider,
 } from "@/components/ui";
 import { CheckCircle, Send, Calculator } from "lucide-react";
@@ -24,18 +23,15 @@ export default function VehicleEnquiryForm({ vehicle }) {
 
   const [form, setForm] = useState({
     enquiry_type: "vehicle_interest",
-
     firstName: "",
     lastName: "",
     mobile: "",
     email: "",
     message: "",
-
     hasTradein: false,
     tradeInYear: "",
     tradeInMake: "",
     tradeInModel: "",
-
     wantsFinance: false,
     wantsTestDrive: false,
   });
@@ -46,107 +42,104 @@ export default function VehicleEnquiryForm({ vehicle }) {
     rate: 5.99,
   });
 
+  const update = (key, value) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
   const calculatePayments = () => {
     const principal = vehicle.price - finance.deposit;
     const r = finance.rate / 100 / 12;
     if (principal <= 0 || r <= 0) return { weekly: 0, monthly: 0 };
-
     const monthly =
       (principal * r * Math.pow(1 + r, finance.term)) /
       (Math.pow(1 + r, finance.term) - 1);
-
-    return {
-      monthly,
-      weekly: (monthly * 12) / 52,
-    };
+    return { monthly, weekly: (monthly * 12) / 52 };
   };
 
   const payments = calculatePayments();
-
-  const update = (key, value) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
 
-    router.post(
-      "/enquiries",
-      {
-        ...form,
-        vehicle_id: vehicle.id,
+    const leadData = {
+      ...form,
+      vehicle_id: vehicle.id,
+      vehicleDetails: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+      vehiclePrice: vehicle.price,
+      financeEstimate: form.wantsFinance
+        ? {
+            weekly: Math.round(payments.weekly),
+            monthly: Math.round(payments.monthly),
+            deposit: finance.deposit,
+            term: finance.term,
+            rate: finance.rate,
+          }
+        : null,
+    };
 
-        financeEstimate: form.wantsFinance
-          ? {
-              weekly: Math.round(payments.weekly),
-              monthly: Math.round(payments.monthly),
-              deposit: finance.deposit,
-              term: finance.term,
-              rate: finance.rate,
-            }
-          : null,
-      },
-      {
-        onSuccess: () => setSubmitted(true),
-        onFinish: () => setLoading(false),
-      }
-    );
+    router.post("/enquiries", leadData, {
+      onSuccess: () => setSubmitted(true),
+      onFinish: () => setLoading(false),
+    });
   };
 
   if (submitted) {
     return (
       <Card className="bg-zinc-900 border-zinc-800">
         <CardContent className="p-6 text-center">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-full gradient-red flex items-center justify-center">
-            <CheckCircle className="text-white w-7 h-7" />
+          <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full gradient-red">
+            <CheckCircle className="w-8 h-8 text-zinc-50" />
           </div>
-          <h3 className="text-lg font-semibold text-zinc-50 mb-1">
-            Enquiry Received
+          <h3 className="text-xl font-bold text-zinc-50 mb-2">
+            Enquiry Received!
           </h3>
-          <p className="text-sm text-zinc-400">
-            We’ll be in touch shortly about this{" "}
-            {vehicle.year} {vehicle.make} {vehicle.model}.
+          <p className="text-sm text-zinc-400 mb-4">
+            Thanks for your interest in this {vehicle.year} {vehicle.make}{" "}
+            {vehicle.model}. We will contact you shortly.
           </p>
         </CardContent>
       </Card>
     );
   }
 
+  // Toggle button colors
+  const buttonOn = "bg-white text-black";
+  const buttonOff = "bg-black text-white";
+
   return (
     <Card className="bg-zinc-900 border-zinc-800">
-      <CardHeader>
-        <CardTitle className="text-zinc-50">Enquire Now</CardTitle>
+      <CardHeader className="p-6">
+        <CardTitle className="text-xl text-zinc-50">Enquire Now</CardTitle>
         <p className="text-sm text-zinc-400">
           Request more info, finance, or a test drive
         </p>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Names */}
           <div className="grid grid-cols-2 gap-3">
             <Input
-              placeholder="First name"
+              placeholder="First Name"
               required
               className="bg-zinc-800 border-zinc-700 text-zinc-50"
               onChange={(e) => update("firstName", e.target.value)}
             />
             <Input
-              placeholder="Last name"
+              placeholder="Last Name"
               required
               className="bg-zinc-800 border-zinc-700 text-zinc-50"
               onChange={(e) => update("lastName", e.target.value)}
             />
           </div>
 
+          {/* Contact */}
           <Input
             placeholder="Mobile"
             required
             className="bg-zinc-800 border-zinc-700 text-zinc-50"
             onChange={(e) => update("mobile", e.target.value)}
           />
-
           <Input
             type="email"
             placeholder="Email (optional)"
@@ -154,28 +147,29 @@ export default function VehicleEnquiryForm({ vehicle }) {
             onChange={(e) => update("email", e.target.value)}
           />
 
+          {/* Message */}
           <Textarea
             placeholder="Your message"
-            className="bg-zinc-800 border-zinc-700 text-zinc-50"
+            className="bg-zinc-800 border-zinc-700 text-zinc-50 h-20"
             onChange={(e) => update("message", e.target.value)}
           />
 
           {/* Trade-in */}
           <div>
-            <p className="text-sm text-zinc-300 mb-1">
-              Do you have a trade-in?
+            <p className="text-sm font-medium text-zinc-300 mb-1">
+              Do you have a vehicle to trade in?
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-2">
               <Button
                 type="button"
-                variant={form.hasTradein ? "default" : "outline"}
+                className={form.hasTradein ? buttonOn : buttonOff}
                 onClick={() => update("hasTradein", true)}
               >
                 Yes
               </Button>
               <Button
                 type="button"
-                variant={!form.hasTradein ? "default" : "outline"}
+                className={!form.hasTradein ? buttonOn : buttonOff}
                 onClick={() => update("hasTradein", false)}
               >
                 No
@@ -183,30 +177,25 @@ export default function VehicleEnquiryForm({ vehicle }) {
             </div>
 
             {form.hasTradein && (
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                <Select
-                  onValueChange={(v) => update("tradeInYear", v)}
-                >
-                  <SelectTrigger className="bg-zinc-800 border-zinc-700">
+              <div className="grid grid-cols-2 gap-3">
+                <Select onValueChange={(v) => update("tradeInYear", v)}>
+                  <SelectTrigger className="bg-zinc-700 border-zinc-600">
                     <SelectValue placeholder="Year" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Array.from({ length: 30 }, (_, i) => 2024 - i).map(
-                      (y) => (
-                        <SelectItem key={y} value={String(y)}>
-                          {y}
+                    {Array.from({ length: 25 }, (_, i) => 2024 - i).map(
+                      (year) => (
+                        <SelectItem key={year} value={String(year)}>
+                          {year}
                         </SelectItem>
                       )
                     )}
                   </SelectContent>
                 </Select>
-
                 <Input
                   placeholder="Make"
-                  className="bg-zinc-800 border-zinc-700 text-zinc-50"
-                  onChange={(e) =>
-                    update("tradeInMake", e.target.value)
-                  }
+                  className="bg-zinc-700 border-zinc-600 text-zinc-50"
+                  onChange={(e) => update("tradeInMake", e.target.value)}
                 />
               </div>
             )}
@@ -214,18 +203,20 @@ export default function VehicleEnquiryForm({ vehicle }) {
 
           {/* Finance */}
           <div>
-            <p className="text-sm text-zinc-300 mb-1">Do you want finance?</p>
-            <div className="flex gap-2">
+            <p className="text-sm font-medium text-zinc-300 mb-1">
+              Do you want finance?
+            </p>
+            <div className="flex gap-2 mb-2">
               <Button
                 type="button"
-                variant={form.wantsFinance ? "default" : "outline"}
+                className={form.wantsFinance ? buttonOn : buttonOff}
                 onClick={() => update("wantsFinance", true)}
               >
                 Yes
               </Button>
               <Button
                 type="button"
-                variant={!form.wantsFinance ? "default" : "outline"}
+                className={!form.wantsFinance ? buttonOn : buttonOff}
                 onClick={() => update("wantsFinance", false)}
               >
                 No
@@ -233,32 +224,43 @@ export default function VehicleEnquiryForm({ vehicle }) {
             </div>
 
             {form.wantsFinance && (
-              <div className="mt-4 bg-zinc-800 rounded-lg p-4 space-y-4">
-                <div className="flex items-center gap-2 text-zinc-300">
+              <div className="bg-zinc-800 rounded-lg p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-2 text-zinc-300">
                   <Calculator className="w-4 h-4 text-red-500" />
-                  Finance Estimate
+                  Finance Calculator
                 </div>
 
-                <Slider
-                  value={[finance.deposit]}
-                  max={vehicle.price * 0.5}
-                  step={1000}
-                  onValueChange={([v]) =>
-                    setFinance({ ...finance, deposit: v })
-                  }
-                />
+                <div>
+                  <label className="text-xs text-zinc-400 mb-1">
+                    Deposit: ${finance.deposit.toLocaleString()}
+                  </label>
+                  <Slider
+                    value={[finance.deposit]}
+                    min={0}
+                    max={vehicle.price * 0.5}
+                    step={1000}
+                    onValueChange={([v]) =>
+                      setFinance({ ...finance, deposit: v })
+                    }
+                  />
+                </div>
 
-                <Slider
-                  value={[finance.term]}
-                  min={12}
-                  max={84}
-                  step={6}
-                  onValueChange={([v]) =>
-                    setFinance({ ...finance, term: v })
-                  }
-                />
+                <div>
+                  <label className="text-xs text-zinc-400 mb-1">
+                    Term: {finance.term} months
+                  </label>
+                  <Slider
+                    value={[finance.term]}
+                    min={12}
+                    max={84}
+                    step={6}
+                    onValueChange={([v]) =>
+                      setFinance({ ...finance, term: v })
+                    }
+                  />
+                </div>
 
-                <div className="grid grid-cols-2 text-center bg-zinc-700 rounded p-3">
+                <div className="grid grid-cols-2 gap-2 text-center bg-zinc-700 rounded-lg p-3">
                   <div>
                     <p className="text-xs text-zinc-400">Weekly</p>
                     <p className="text-lg font-bold text-red-500">
@@ -276,25 +278,23 @@ export default function VehicleEnquiryForm({ vehicle }) {
             )}
           </div>
 
-          {/* Test drive */}
+          {/* Test Drive Button */}
           <Button
             type="button"
-            variant={form.wantsTestDrive ? "default" : "outline"}
-            className="w-full"
-            onClick={() =>
-              update("wantsTestDrive", !form.wantsTestDrive)
-            }
+            className={`${form.wantsTestDrive ? buttonOn : buttonOff} w-full`}
+            onClick={() => update("wantsTestDrive", !form.wantsTestDrive)}
           >
-            Request a test drive
+            {form.wantsTestDrive ? "Requesting Test Drive" : "Request Test Drive"}
           </Button>
 
+          {/* Submit */}
           <Button
             type="submit"
-            className="w-full gradient-red text-white"
+            className="w-full gradient-red text-zinc-50 py-3 flex items-center justify-center"
             disabled={loading}
           >
             <Send className="w-4 h-4 mr-2" />
-            {loading ? "Sending…" : "Submit Enquiry"}
+            {loading ? "Sending..." : "Submit Enquiry"}
           </Button>
         </form>
       </CardContent>
